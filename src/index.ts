@@ -4,7 +4,6 @@ import execa from 'execa'
 import pkgDir from 'pkg-dir'
 import path from 'path'
 import prettier from 'prettier'
-import stringify from 'json-stable-stringify'
 
 interface WorkSpaceInfo {
   [key: string]: {
@@ -21,7 +20,7 @@ const stringifyTSConfig = async (
   tsConfig: any,
   path: string,
 ): Promise<string> => {
-  const text = stringify(tsConfig, { space: 2 })
+  const text = JSON.stringify(tsConfig, null, 2)
   const prettierOptions = await prettier.resolveConfig(path)
   return prettier.format(text, {
     ...prettierOptions,
@@ -36,27 +35,42 @@ const run = async ({ mode }: { mode: 'check' | 'write' }) => {
   }
   const rootTSConfigPath = path.join(root, 'tsconfig.json')
   const { stdout: raw } = await execa('yarn', [
-    '--silent',
     'workspaces',
-    'info',
+    'list',
     '--json',
+    '--verbose',
   ])
-  const workspaceInfo: WorkSpaceInfo = JSON.parse(raw)
+
+  const workspaceInfo: WorkSpaceInfo = {}
+
+  for (const line of raw.split('\n')) {
+    const info = JSON.parse(line)
+    workspaceInfo[info.name] = info
+  }
   const packageNames = Object.keys(workspaceInfo)
 
   const getPackageInfo = async (name: string) => {
     const info = workspaceInfo[name]
     const tsConfigPath = path.join(root, info.location, 'tsconfig.json')
     const tsConfigExists = await fs.pathExists(tsConfigPath)
+    if (tsConfigExists) {
+      var tsConfig = JSON.parse(await fs.readFile(tsConfigPath, {
+        encoding: 'utf8',
+      }))
+    }
     return {
       tsConfigPath: tsConfigExists ? tsConfigPath : undefined,
       name,
+      location: info.location,
+      isComposite: !!tsConfig?.compilerOptions?.composite,
     }
   }
 
   const idk: {
     tsConfigPath: string | undefined
-    name: string
+    name: string,
+    isComposite: boolean,
+    location: string,
   }[] = await Promise.all(
     packageNames.map(async (name) => getPackageInfo(name)),
   )
@@ -68,13 +82,14 @@ const run = async ({ mode }: { mode: 'check' | 'write' }) => {
     {},
   )
 
+  const compositePackages = new Set(idk.filter(v => v.isComposite).map(v => v.location))
+
   const processPackage = async (
     name: string,
   ): Promise<{ wasOutOfSync: boolean; wasWritten: boolean } | {}> => {
     const info = workspaceInfo[name]
     const tsConfigPath = nameToConfigPath[name]
     if (tsConfigPath) {
-      const location = path.join(root, info.location)
       const tsConfigString = await fs.readFile(tsConfigPath, {
         encoding: 'utf8',
       })
@@ -82,9 +97,9 @@ const run = async ({ mode }: { mode: 'check' | 'write' }) => {
       const tsConfigTarget = {
         ...tsConfig,
         references: info.workspaceDependencies
-          .map((v) => nameToConfigPath[v])
           .filter(isNotUndefined)
-          .map((v) => path.relative(location, v))
+          .filter(v => compositePackages.has(v))
+          .map((v) => path.relative(info.location, v))
           .map((v) => ({ path: v })),
       }
       const tsConfigTargetString = await stringifyTSConfig(

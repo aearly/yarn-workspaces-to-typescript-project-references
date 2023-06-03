@@ -1,13 +1,13 @@
 {
-  "name": "yarn-workspaces-to-typescript-project-references",
-  "version": "2.1.9",
-  "homepage": "https://github.com/DylanVann/yarn-workspaces-to-typescript-project-references#readme",
+  "name": "@aearly/yarn-workspaces-to-typescript-project-references",
+  "version": "1.0.0",
+  "homepage": "https://github.com/aearly/yarn-workspaces-to-typescript-project-references#readme",
   "bugs": {
-    "url": "https://github.com/DylanVann/yarn-workspaces-to-typescript-project-references/issues"
+    "url": "https://github.com/aearly/yarn-workspaces-to-typescript-project-references/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DylanVann/yarn-workspaces-to-typescript-project-references.git"
+    "url": "git+https://github.com/aearly/yarn-workspaces-to-typescript-project-references.git"
   },
   "license": "MIT",
   "author": "Dylan Vann",
@@ -31,7 +31,6 @@
   "dependencies": {
     "execa": "^4.0.2",
     "fs-extra": "^9.1.0",
-    "json-stable-stringify": "^1.0.1",
     "lodash.mapvalues": "^4.6.0",
     "pkg-dir": "^4.2.0",
     "prettier": "^2.2.1",
@@ -39,7 +38,6 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.6",
-    "@types/json-stable-stringify": "^1.0.32",
     "@types/lodash.mapvalues": "^4.6.6",
     "@types/prettier": "^2.1.6",
     "dv-scripts": "^1.4.2",

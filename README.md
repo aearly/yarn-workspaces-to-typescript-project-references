@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/yarn-workspaces-to-typescript-project-references)](https://www.npmjs.com/package/yarn-workspaces-to-typescript-project-references)
 
-Sync [Yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) dependencies in `package.json` files with [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files.
+Sync [Yarn 3 workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) dependencies in `package.json` files with [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files.
 
 This project may be deprecated when this is resolved: https://github.com/microsoft/TypeScript/issues/25376
 

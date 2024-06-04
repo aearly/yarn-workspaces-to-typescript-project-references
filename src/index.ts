@@ -98,7 +98,7 @@ const run = async ({ mode }: { mode: 'check' | 'write' }) => {
         ...tsConfig,
         references: info.workspaceDependencies
           .filter(isNotUndefined)
-          .filter(v => compositePackages.has(v))
+          .filter(v => compositePackages.has(v) && v !== info.location)
           .map((v) => path.relative(info.location, v))
           .map((v) => ({ path: v })),
       }
